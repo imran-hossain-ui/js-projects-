@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weather App UI</title>
+  <style>
+    :root{
+      --bg: linear-gradient(135deg,#e0f7ff 0%, #f7fbff 100%);
+      --card:#ffffff;
+      --accent:#1e88e5;
+      --muted:#6b7280;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 8px 30px rgba(30, 41, 59, 0.274);
+      --radius:18px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--bg);
+      padding:24px;
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .container{
+      width:100%;
+      max-width:420px;
+    }
+
+    .weather-card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      overflow:hidden;
+      border:1px solid rgba(15,23,42,0.04);
+    }
+
+    /* search */
+    .search-row{
+      display:flex;
+      gap:8px;
+      margin-bottom:14px;
+    }
+
+    .search-row input{
+      flex:1;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,0.06);
+      background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,250,0.9));
+      font-size:14px;
+      outline:none;
+    }
+
+    .search-row button{
+      padding:10px 14px;
+      border-radius:12px;
+      border:none;
+      background:var(--accent);
+      color:white;
+      font-weight:600;
+      cursor:pointer;
+      min-width:54px;
+    }
+
+    /* main */
+    .main{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:10px 6px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(30,136,229,0.06), rgba(255,255,255,0.02));
+    }
+
+    .icon-wrap{
+      width:92px;
+      height:92px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--glass);
+      border-radius:14px;
+      flex-shrink:0;
+      box-shadow:0 6px 18px rgba(30,41,59,0.05);
+      position:relative;
+    }
+
+    .icon-wrap img{width:70px;height:70px;object-fit:contain}
+
+    .info{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .temp{
+      font-size:40px;
+      font-weight:700;
+      line-height:1;
+    }
+
+    .city{
+      font-size:16px;
+      font-weight:600;
+      color:var(--muted);
+    }
+
+    /* details */
+    .details{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      justify-content:space-between;
+    }
+
+    .detail-item{
+      flex:1;
+      background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(255,255,255,0.01));
+      padding:10px 12px;
+      border-radius:10px;
+      text-align:center;
+      border:1px solid rgba(15,23,42,0.03);
+    }
+
+    .detail-item small{display:block;font-size:12px;color:var(--muted);}
+    .detail-item strong{display:block;font-size:16px;margin-top:6px}
+
+    /* footer */
+    .meta{
+      margin-top:12px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+
+    /* responsive */
+    @media (max-width:420px){
+      .temp{font-size:34px}
+      .icon-wrap{width:78px;height:78px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="weather-card">
+      <!-- Search -->
+      <div class="search-row">
+        <input id="searchInput" type="search" placeholder="Search city or postal code" aria-label="Search city" />
+        <button id="searchBtn" type="button">Go</button>
+      </div>
+
+      <!-- Main weather summary -->
+      <div class="main">
+        <div class="icon-wrap">
+          <!-- placeholder image: replace src with weather icon from API -->
+          <img id="weatherIcon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 64 64'><g fill='%231e88e5'><circle cx='32' cy='28' r='10'/><path d='M14 44c0-6.627 5.373-12 12-12h12c6.627 0 12 5.373 12 12v2H14v-2z' fill='%23ffd54f'/></g></svg>" alt="weather icon" />
+        </div>
+
+        <div class="info">
+          <div class="temp" id="temperature">--°C</div>
+          <div class="city" id="cityName">City Name</div>
+          <div class="meta" id="condText">--</div>
+        </div>
+      </div>
+
+      <!-- details -->
+      <div class="details">
+        <div class="detail-item">
+          <small>Humidity</small>
+          <strong id="humidity">-- %</strong>
+        </div>
+        <div class="detail-item">
+          <small>Wind Speed</small>
+          <strong id="wind">-- m/s</strong>
+        </div>
+        <div class="detail-item">
+          <small>Feels like</small>
+          <strong id="feels">--°C</strong>
+        </div>
+      </div>
+
+      <!-- small usage note -->
+      <div class="meta">Tip: plug an API (OpenWeatherMap, WeatherAPI, etc.) and update the DOM with JavaScript.</div>
+    </div>
+  </div>
+
+  <!-- Optional: a tiny script to show how you might wire things (REMOVE if you only want HTML/CSS) -->
+  <script>
+
+    // Example: this only demonstrates wiring of elements. Replace with real API calls.
+    const searchBtn = document.getElementById('searchBtn');
+    const input = document.getElementById('searchInput'); 
+
+      // Here you'd fetch from your weather API and then update the UI elements below.
+      // For demonstration we'll show dummy data:
+      let cityname = document.getElementById('cityName');
+      let temperature = document.getElementById('temperature');
+      let humidity = document.getElementById('humidity');
+      let wind = document.getElementById('wind');
+      let feels = document.getElementById('feels');
+      let citycondTextname = document.getElementById('condText');
+      let icon = document.getElementById('weatherIcon');
+   
+
+  //maindata
+const weatherInfo = [
+  {city:"Dhaka", temperature:"31°C", humidity:"65%", wind:"3.0 m/s", feels_like:"33°C", condition_text:"Partly cloudy", icon_url:"https://example.com/icon.png"},
+  {city:"Chattogram", temperature:"33°C", humidity:"60%", wind:"4.5 m/s", feels_like:"34°C", condition_text:"Sunny", icon_url:"https://example.com/icon.png"},
+  {city:"Khulna", temperature:"30°C", humidity:"70%", wind:"3.2 m/s", feels_like:"31°C", condition_text:"Cloudy", icon_url:"https://example.com/icon.png"},
+  {city:"Barishal", temperature:"29°C", humidity:"72%", wind:"2.8 m/s", feels_like:"30°C", condition_text:"Rainy", icon_url:"https://example.com/icon.png"},
+  {city:"Sylhet", temperature:"28°C", humidity:"78%", wind:"2.5 m/s", feels_like:"29°C", condition_text:"Thunderstorm", icon_url:"https://example.com/icon.png"},
+  {city:"Rajshahi", temperature:"32°C", humidity:"60%", wind:"3.5 m/s", feels_like:"33°C", condition_text:"Sunny", icon_url:"https://example.com/icon.png"},
+  {city:"Rangpur", temperature:"30°C", humidity:"68%", wind:"3.0 m/s", feels_like:"31°C", condition_text:"Partly cloudy", icon_url:"https://example.com/icon.png"},
+  {city:"Mymensingh", temperature:"29°C", humidity:"70%", wind:"2.7 m/s", feels_like:"30°C", condition_text:"Cloudy", icon_url:"https://example.com/icon.png"}
+];
+    
+    //what user is asking for    
+        searchBtn.addEventListener('click', function(){
+            let userIsAskingFor = input.value.trim().toLowerCase();
+        let find = false;   
+            //looping through data and extract them
+            for (let i=0; i<weatherInfo.length; i++){
+                let cityweatherInfo = weatherInfo[i]
+                console.log(cityweatherInfo);
+                //cheking the input and showing the result   
+                if(userIsAskingFor === cityweatherInfo.city.toLowerCase()){
+                find = true;
+                cityname.textContent = cityweatherInfo.city;
+                temperature.textContent = cityweatherInfo.temperature;
+                humidity.textContent = cityweatherInfo.humidity;
+                wind.textContent = cityweatherInfo.wind;
+                feels.textContent = cityweatherInfo.feels_like;
+                citycondTextname.textContent  = cityweatherInfo.condition_text ;
+                }
+            }
+            if(!find){
+                alert("City not found in the list!");
+            }
+        })
+
+  </script>
+</body>
+</html>
