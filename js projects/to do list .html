@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App</title>
+  <style>
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      background: #f0f4f8;
+      padding: 50px 20px;
+    }
+
+    .todo-container {
+      background: #401980ab;
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .todo-container h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .input-section {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    #todo-input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    #add-btn {
+      padding: 10px 15px;
+      background: #a50909;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #add-btn:hover {
+      background: #45a049;
+    }
+
+    #todo-list {
+      list-style: none;
+    }
+
+    .todo-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+      border-radius: 5px;
+      border: 1px solid #eee;
+      transition: background 0.3s;
+    }
+
+    .todo-item:hover {
+      background: #f1f1f1;
+    }
+
+    .todo-text {
+      flex: 1;
+    }
+
+    .delete-btn {
+      background: #e74c3c;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .delete-btn:hover {
+      background: #c0392b;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: #999;
+    }  
+
+    ul {
+    list-style: none;
+    padding: 0;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #f9f9f9;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    li:hover {
+      background: #f1f1f1;
+    }
+
+    li input[type="checkbox"] {
+      transform: scale(1.3);
+      cursor: pointer;
+    }
+
+    li h1 {
+      flex: 1;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      margin-left: 10px;
+    }
+
+    li button {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    li button:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div class="todo-container">
+    <h1>My Todo List</h1>
+    <div class="input-section">
+      <input type="text" id="todo-input" placeholder="Add a new task...">
+      <button id="add-btn">Add</button>
+    </div>
+    <ul id="todo-list">
+      <!-- <li>
+        <input type="checkbox">
+        <h1>My To-Do List</h1>
+        <button>Delete</button>
+      </li> -->
+    </ul>
+  </div>
+
+  <script>
+    // JS selectors to access HTML elements
+    const todoInput = document.getElementById('todo-input');  // input box
+    const addBtn = document.getElementById('add-btn');        // add button
+    const todoList = document.getElementById('todo-list');    // ul for tasks
+
+    // We'll store todos as objects { text, done } so checkbox state can persist
+    let userToDo = [];
+
+    // Load todos from localStorage (support older format of array-of-strings)
+    const stored = localStorage.getItem('userToDo');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          if (parsed.length && typeof parsed[0] === 'string') {
+            userToDo = parsed.map(s => ({ text: s, done: false }));
+          } else {
+            userToDo = parsed;
+          }
+        }
+      } catch (e) {
+        // If parsing fails, start with defaults
+        userToDo = [
+          { text: 'buy groceries', done: false },
+          { text: 'attend meeting', done: false },
+          { text: 'workout session', done: false }
+        ];
+      }
+    } else {
+      // default items when nothing in storage
+      userToDo = [
+        { text: 'buy groceries', done: false },
+        { text: 'attend meeting', done: false },
+        { text: 'workout session', done: false }
+      ];
+    }
+
+    // Save helper
+    function saveTodos() {
+      localStorage.setItem('userToDo', JSON.stringify(userToDo));
+    }
+
+    // Add button behavior — keep your variable name TypetoDo
+    addBtn.addEventListener('click', function(){
+      const TypetoDo = todoInput.value.trim();
+      if (!TypetoDo) return; // ignore empty
+      userToDo.push({ text: TypetoDo, done: false });
+      todoInput.value = '';
+      saveTodos();
+      renderList();
+    });
+
+    function renderList(){
+      // Clear the current list in the DOM to avoid duplicating items when re-rendering
+      todoList.innerHTML = '';
+
+      // Loop through the array and create one <li> per item
+      for (let i = 0; i < userToDo.length; i++) {
+        const item = userToDo[i];
+
+        const toDosHtml = document.createElement('li');
+        toDosHtml.innerHTML = `
+          <input type="checkbox" ${item.done ? 'checked' : ''}>
+          <h1 style="${item.done ? 'text-decoration: line-through' : ''}">${item.text}</h1>
+          <button>Delete</button>
+        `;
+
+        // Delete handler
+        const deleteBtn = toDosHtml.querySelector('button');
+        deleteBtn.addEventListener('click', function() {
+          userToDo.splice(i, 1);
+          saveTodos();
+          renderList();
+        });
+
+        // Checkbox handler
+        const checkbox = toDosHtml.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+          const title = this.nextElementSibling;
+          if (this.checked) {
+            title.style.textDecoration = 'line-through';
+            item.done = true;
+          } else {
+            title.style.textDecoration = 'none';
+            item.done = false;
+          }
+          saveTodos();
+        });
+
+        todoList.appendChild(toDosHtml);
+      }
+    }
+
+    // initial render
+    renderList();
+  </script>
+</body>
+</html>
